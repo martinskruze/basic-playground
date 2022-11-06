@@ -1,39 +1,25 @@
-# from ruby MRI version 3.1.2:
-FROM ruby:3.1.2
+FROM ruby:3.1.2-slim
 
-# set up contact person for our project
-LABEL maintainer='martins.kruze@gmail.com'
-
-# remove all downloaded lists with rm -rf /var/lib/apt/lists/*
 RUN apt-get update -qq && apt-get install -yq --no-install-recommends \
     build-essential \
     gnupg2 \
     less \
+    git \
     libpq-dev \
     postgresql-client \
     libvips42 \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# to be sure - lets set up lang
-ENV LANG=C.UTF-8 
-
-# update and install new bundler
+ENV LANG=C.UTF-8 \
+  BUNDLE_JOBS=4 \
+  BUNDLE_RETRY=3
+  
 RUN gem update --system && gem install bundler
 
-# make application direcory
-RUN mkdir /rails_7
+WORKDIR /usr/src/app
 
-# change working direcotry to it
-WORKDIR /rails_7
+ENTRYPOINT ["./entrypoint.sh"]
 
-# copy Gemfile and Gemfile.lock to our working direcotory
-COPY Gemfile* /rails_7/
+EXPOSE 3000
 
-# install gems
-RUN bundle install
-
-# copy our project
-COPY . /rails_7
-
-# script that removes tmp/pids/server.pid file if it exists (need ensure it is executable with chmod +x docker-entrypoint.sh)
-ENTRYPOINT ["./docker-entrypoint.sh"]
+CMD ["bundle", "exec", "rails", "s", "-b", "0.0.0.0"]
