@@ -5,9 +5,17 @@ FROM ruby:3.1.2
 LABEL maintainer='martins.kruze@gmail.com'
 
 # remove all downloaded lists with rm -rf /var/lib/apt/lists/*
-RUN apt-get update -yqq \
-  && apt-get install -yqq --no-install-recommends apt-utils postgresql-client \
-  && rm -rf /var/lib/apt/lists/*
+RUN apt-get update -qq && apt-get install -yq --no-install-recommends \
+    build-essential \
+    gnupg2 \
+    less \
+    libpq-dev \
+    postgresql-client \
+    libvips42 \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# to be sure - lets set up lang
+ENV LANG=C.UTF-8 
 
 # make application direcory
 RUN mkdir /rails_7
