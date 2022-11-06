@@ -17,6 +17,9 @@ RUN apt-get update -qq && apt-get install -yq --no-install-recommends \
 # to be sure - lets set up lang
 ENV LANG=C.UTF-8 
 
+# update and install new bundler
+RUN gem update --system && gem install bundler
+
 # make application direcory
 RUN mkdir /rails_7
 
